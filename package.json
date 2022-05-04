@@ -1,0 +1,18 @@
+{
+  "name": "comments-tailwind-vue",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.3.1",
+    "@vue/compiler-sfc": "^3.2.33",
+    "autoprefixer": "^10.3.1",
+    "tailwindcss": "^2.2.4",
+    "vite": "^2.9.7",
+    "vue": "^3.2.33"
+  }
+}
