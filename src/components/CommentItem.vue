@@ -1,10 +1,9 @@
 <script setup>
-const props = defineProps(['user', 'avatar', 'time', 'content'])
+defineProps(['user', 'avatar', 'time', 'content'])
 </script>
 
 <template>
   <div class="flex">
-    <!-- 即使在 public 資料夾下，也需要使用 / 絕對路徑引用它下面的文件，省略 Public -->
     <img :src="avatar" alt="" class="w-12 h-12 mr-4 rounded-full" />
     <div>
       <p>{{ user }}</p>

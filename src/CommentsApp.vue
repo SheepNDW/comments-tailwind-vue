@@ -1,15 +1,19 @@
 <script setup>
-import CommentBoxVue from './components/CommentBox.vue'
-import DividerHorizontalVue from './components/DividerHorizontal.vue'
-import CommentItemVue from './components/CommentItem.vue'
-import ReplyBoxVue from './components/ReplyBox.vue'
-
+import CommentBox from './components/CommentBox.vue'
+import DividerHorizontal from './components/DividerHorizontal.vue'
+import CommentItem from './components/CommentItem.vue'
+import ReplyBox from './components/ReplyBox.vue'
+import ReplyContainer from './components/ReplyContainer.vue'
 import face1 from './assets/images/face1.png'
 import face2 from './assets/images/face2.png'
 import face3 from './assets/images/face3.jpg'
+import face4 from './assets/images/face4.jpg'
+import { ref } from 'vue'
+
+let rid = ref(4)
 
 // --- mock data ---
-const comments = [
+const comments = ref([
   {
     id: 1,
     user: '安妮亞',
@@ -34,28 +38,53 @@ const comments = [
       }
     ]
   }
-]
+])
 // --- mock data ---
+
+const constructNewComment = (content) => {
+  return {
+    id: rid.value++,
+    user: '當前用戶',
+    avatar: face4,
+    content,
+    time: '1 秒前'
+  }
+}
+
+const addNewComment = (content) => {
+  const newComment = constructNewComment(content)
+  comments.value.push(newComment)
+}
+
+const addReply = (content, id) => {
+  const reply = constructNewComment(content)
+  let comment = comments.value.find((comment) => comment.id === id)
+  if (comment.replies) {
+    comment.replies.push(reply)
+  } else {
+    comment.replies = [reply]
+  }
+}
 </script>
 
 <template>
   <main class="p-4 bg-gray-50 min-h-screen">
     <div class="max-w-screen-xl mx-auto bg-white p-8 rounded-lg shadow-2xl">
       <h2 class="text-3xl my-6">評論</h2>
-      <CommentBoxVue />
+      <CommentBox @submit="addNewComment" />
       <!-- 分隔線 -->
-      <DividerHorizontalVue />
+      <DividerHorizontal />
       <div v-for="comment in comments" :key="comment.id">
         <!-- 單個留言 -->
-        <CommentItemVue
+        <CommentItem
           :user="comment.user"
           :avatar="comment.avatar"
           :time="comment.time"
           :content="comment.content"
         />
         <!-- 回覆列表 -->
-        <ReplyBoxVue v-if="comment.replies">
-          <CommentItemVue
+        <ReplyContainer v-if="comment.replies">
+          <CommentItem
             v-for="reply in comment.replies"
             :key="reply.id"
             :user="reply.user"
@@ -63,7 +92,8 @@ const comments = [
             :time="reply.time"
             :content="reply.content"
           />
-        </ReplyBoxVue>
+        </ReplyContainer>
+        <ReplyBox @submit="addReply($event, comment.id)" />
       </div>
     </div>
   </main>

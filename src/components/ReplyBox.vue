@@ -1,8 +1,23 @@
-<script setup></script>
+<script setup>
+import CommentBox from './CommentBox.vue'
+import { ref } from 'vue'
+
+const isShowCommentBox = ref(false)
+
+const emit = defineEmits(['submit'])
+const onSubmit = (content) => {
+  emit('submit', content)
+  isShowCommentBox.value = false
+}
+</script>
 
 <template>
-  <div class="pl-8 border-l-2 border-gray-200">
-    <slot />
-  </div>
-  <button class="pt-4 pb-10 text-blue-600">回覆</button>
+  <button
+    class="pt-4 text-blue-600"
+    :class="[isShowCommentBox ? 'pb-2' : 'pb-10']"
+    @click="isShowCommentBox = !isShowCommentBox"
+  >
+    回覆
+  </button>
+  <CommentBox v-if="isShowCommentBox" class="mb-4" @submit="onSubmit" />
 </template>
