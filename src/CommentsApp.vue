@@ -15,7 +15,7 @@ const getAllComments = async () => {
 getAllComments()
 
 const addNewComment = async (content, replyTo) => {
-  await fetch(`/api/comments`, {
+  const res = await fetch(`/api/comments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -26,11 +26,18 @@ const addNewComment = async (content, replyTo) => {
     })
   })
 
+  const newComment = await res.json()
+  if (!replyTo) {
+    comments.value.unshift(newComment)
+  } else {
+    comments.value.find((c) => c.id === replyTo).replies.unshift(newComment)
+  }
+
   // 新增完評論後，自動獲取新的評論列表
   // Notion API 有延遲，在添加完 page 之後，需要過一會才能獲取到新的評論列表
-  setTimeout(async () => {
-    await getAllComments()
-  }, 1000)
+  // setTimeout(async () => {
+  //   await getAllComments()
+  // }, 1000)
 }
 </script>
 
