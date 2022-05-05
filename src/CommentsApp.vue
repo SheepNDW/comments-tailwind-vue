@@ -4,66 +4,33 @@ import DividerHorizontal from './components/DividerHorizontal.vue'
 import CommentItem from './components/CommentItem.vue'
 import ReplyBox from './components/ReplyBox.vue'
 import ReplyContainer from './components/ReplyContainer.vue'
-import face1 from './assets/images/face1.png'
-import face2 from './assets/images/face2.png'
-import face3 from './assets/images/face3.jpg'
-import face4 from './assets/images/face4.jpg'
 import { ref } from 'vue'
 
-let rid = ref(4)
+const comments = ref([])
 
-// --- mock data ---
-const comments = ref([
-  {
-    id: 1,
-    user: '安妮亞',
-    avatar: face1,
-    time: '2小時之前',
-    content:
-      '好了啦特哥椅子哥丹利哥死哥維爾戈靈魂收割多佛朗明哥豬大哥蒼藍鴿中華民國國歌UC姐K7姐好運姐冰冰姐 ...',
-    replies: [
-      {
-        id: 2,
-        user: '台V笨狗',
-        avatar: face2,
-        time: '2小時之前',
-        content: '讚！'
-      },
-      {
-        id: 3,
-        user: '角卷棉芽',
-        avatar: face3,
-        time: '2小時之前',
-        content: 'konban dododo !!!'
-      }
-    ]
-  }
-])
-// --- mock data ---
-
-const constructNewComment = (content) => {
-  return {
-    id: rid.value++,
-    user: '當前用戶',
-    avatar: face4,
-    content,
-    time: '1 秒前'
-  }
+const getAllComments = async () => {
+  const res = await fetch('/api/comments')
+  comments.value = await res.json()
 }
+getAllComments()
 
-const addNewComment = (content) => {
-  const newComment = constructNewComment(content)
-  comments.value.push(newComment)
-}
+const addNewComment = async (content, replyTo) => {
+  await fetch(`/api/comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      content,
+      ...(replyTo && { replyTo })
+    })
+  })
 
-const addReply = (content, id) => {
-  const reply = constructNewComment(content)
-  let comment = comments.value.find((comment) => comment.id === id)
-  if (comment.replies) {
-    comment.replies.push(reply)
-  } else {
-    comment.replies = [reply]
-  }
+  // 新增完評論後，自動獲取新的評論列表
+  // Notion API 有延遲，在添加完 page 之後，需要過一會才能獲取到新的評論列表
+  setTimeout(async () => {
+    await getAllComments()
+  }, 1000)
 }
 </script>
 
@@ -93,7 +60,7 @@ const addReply = (content, id) => {
             :content="reply.content"
           />
         </ReplyContainer>
-        <ReplyBox @submit="addReply($event, comment.id)" />
+        <ReplyBox @submit="addNewComment($event, comment.id)" />
       </div>
     </div>
   </main>
